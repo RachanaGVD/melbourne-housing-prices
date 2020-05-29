@@ -6,6 +6,10 @@ from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder
 
+from sklearn.ensemble import RandomForestRegressor
+
+from sklearn.metrics import mean_absolute_error
+
 # Read the data
 data = pd.read_csv('melb_data.csv')
 
@@ -39,7 +43,7 @@ numerical_transformer = SimpleImputer(strategy='constant')
 
 # Preprocessing for categorical data
 categorical_transformer = Pipeline(steps=[
-    ('imputer', SimpleImputer(strategy='most_frequenct')),
+    ('imputer', SimpleImputer(strategy='most_frequent')),
     ('onehot', OneHotEncoder(handle_unknown='ignore'))
 ])
 
@@ -50,3 +54,24 @@ preprocessor = ColumnTransformer(
         ('cat', categorical_transformer, categorical_cols)
     ]
 )
+
+# Define a Random Forest Model
+model = RandomForestRegressor(n_estimators=100, random_state=0)
+
+# Create and evaluate the Pipeline
+
+# Bundle preprocessing and modeling code in pipeline
+my_pipeline = Pipeline(steps=[
+    ('preprocessor',preprocessor),
+    ('model', model)
+])
+
+# Preprocessing of traning data, fit model
+my_pipeline.fit(X_train, y_train)
+
+# Prerocessing of validation data, get predictions
+preds = my_pipeline.predict(X_valid)
+
+#Evaluate the model
+score = mean_absolute_error(y_valid, preds)
+print('MAE:',score)
