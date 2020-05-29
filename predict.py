@@ -1,6 +1,11 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder
+
 # Read the data
 data = pd.read_csv('melb_data.csv')
 
@@ -24,3 +29,24 @@ numerical_cols = [cname for cname in X_train_full.columns if X_train_full[cname]
 my_cols = categorical_cols + numerical_cols
 X_train = X_train_full[my_cols].copy()
 X_valid = X_valid_full[my_cols].copy()
+
+print (X_train.head())
+
+# Piplines used for better readability. 
+
+# Preprocessing for numerical data
+numerical_transformer = SimpleImputer(strategy='constant')
+
+# Preprocessing for categorical data
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='most_frequenct')),
+    ('onehot', OneHotEncoder(handle_unknown='ignore'))
+])
+
+# Bundle preprocessing for numerical and categorical data
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', numerical_transformer, numerical_cols),
+        ('cat', categorical_transformer, categorical_cols)
+    ]
+)
